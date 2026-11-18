@@ -12,6 +12,7 @@ use Klevu\Logger\Service\LogLevelComparatorService;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class LoggingEnabledServiceTest extends TestCase
@@ -43,6 +44,7 @@ class LoggingEnabledServiceTest extends TestCase
                 ]),
                 'psrConvertLogLevelService' => $this->getPsrToZendConvertLogLevelServiceMock(),
                 'configConvertLogLevelService' => null,
+                'storeManager' => $this->createStub(StoreManagerInterface::class),
                 'isEnabledConfigPath' => 'klevu_logger/configuration/enable_logging',
                 'minLogLevelConfigPath' => 'klevu_logger/configuration/min_log_level',
             ]
@@ -88,6 +90,7 @@ class LoggingEnabledServiceTest extends TestCase
                 ]),
                 'psrConvertLogLevelService' => $this->getPsrToZendConvertLogLevelServiceMock(),
                 'configConvertLogLevelService' => null,
+                'storeManager' => $this->createStub(StoreManagerInterface::class),
                 'isEnabledConfigPath' => 'klevu_logger/configuration/enable_logging',
                 'minLogLevelConfigPath' => 'klevu_logger/configuration/min_log_level',
             ]
@@ -134,6 +137,7 @@ class LoggingEnabledServiceTest extends TestCase
                 ]),
                 'psrConvertLogLevelService' => $this->getPsrToZendConvertLogLevelServiceMock(),
                 'configConvertLogLevelService' => null,
+                'storeManager' => $this->createStub(StoreManagerInterface::class),
                 'isEnabledConfigPath' => 'klevu_logger/configuration/enable_logging',
                 'minLogLevelConfigPath' => 'klevu_logger/configuration/min_log_level',
             ]
@@ -180,6 +184,7 @@ class LoggingEnabledServiceTest extends TestCase
                 ]),
                 'psrConvertLogLevelService' => $this->getPsrToZendConvertLogLevelServiceMock(),
                 'configConvertLogLevelService' => null,
+                'storeManager' => $this->createStub(StoreManagerInterface::class),
                 'isEnabledConfigPath' => 'klevu_logger/configuration/enable_logging',
                 'minLogLevelConfigPath' => 'klevu_logger/configuration/min_log_level',
             ]
@@ -217,7 +222,7 @@ class LoggingEnabledServiceTest extends TestCase
      * @param int $adminMinLogLevel
      * @param bool $storeEnableLogging
      * @param int $storeMinLogLevel
-     * @return ScopeConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return ScopeConfigInterface|\PHPUnit\Framework\MockObject\Stub
      */
     private function getScopeConfigMock(
         $adminEnableLogging,
@@ -225,24 +230,24 @@ class LoggingEnabledServiceTest extends TestCase
         $storeEnableLogging,
         $storeMinLogLevel
     ) {
-        if (!method_exists($this, 'createMock')) {
+        if (!method_exists($this, 'createStub')) {
             return $this->getScopeConfigMockLegacy($adminEnableLogging, $adminMinLogLevel, $storeEnableLogging, $storeMinLogLevel);
         }
 
-        $scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
+        $scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
 
-        $scopeConfigMock->method('isSetFlag')->will($this->returnValueMap([
+        $scopeConfigMock->method('isSetFlag')->willReturnMap([
             ['klevu_logger/configuration/enable_logging', 'default', null, $adminEnableLogging],
             ['klevu_logger/configuration/enable_logging', 'default', 0, $adminEnableLogging],
             ['klevu_logger/configuration/enable_logging', 'stores', 0, $adminEnableLogging],
             ['klevu_logger/configuration/enable_logging', 'stores', 1, $storeEnableLogging],
-        ]));
-        $scopeConfigMock->method('getValue')->will($this->returnValueMap([
+        ]);
+        $scopeConfigMock->method('getValue')->willReturnMap([
             ['klevu_logger/configuration/min_log_level', 'default', null, (string)$adminMinLogLevel],
             ['klevu_logger/configuration/min_log_level', 'default', 0, (string)$adminMinLogLevel],
             ['klevu_logger/configuration/min_log_level', 'stores', 0, (string)$adminMinLogLevel],
             ['klevu_logger/configuration/min_log_level', 'stores', 1, (string)$storeMinLogLevel],
-        ]));
+        ]);
 
         return $scopeConfigMock;
     }
@@ -264,16 +269,14 @@ class LoggingEnabledServiceTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $scopeConfigMock->expects($this->any())
-            ->method('isSetFlag')
+        $scopeConfigMock->method('isSetFlag')
             ->willReturnMap([
                 ['klevu_logger/configuration/enable_logging', 'default', null, $adminEnableLogging],
                 ['klevu_logger/configuration/enable_logging', 'default', 0, $adminEnableLogging],
                 ['klevu_logger/configuration/enable_logging', 'stores', 0, $adminEnableLogging],
                 ['klevu_logger/configuration/enable_logging', 'stores', 1, $storeEnableLogging],
             ]);
-        $scopeConfigMock->expects($this->any())
-            ->method('getValue')
+        $scopeConfigMock->method('getValue')
             ->willReturnMap([
                 ['klevu_logger/configuration/min_log_level', 'default', null, (string)$adminMinLogLevel],
                 ['klevu_logger/configuration/min_log_level', 'default', 0, (string)$adminMinLogLevel],
@@ -285,17 +288,17 @@ class LoggingEnabledServiceTest extends TestCase
     }
 
     /**
-     * @return ConvertLogLevelServiceInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return ConvertLogLevelServiceInterface|\PHPUnit\Framework\MockObject\Stub
      */
     private function getPsrToZendConvertLogLevelServiceMock()
     {
-         if (!method_exists($this, 'createMock')) {
+         if (!method_exists($this, 'createStub')) {
              return $this->getPsrToZendConvertLogLevelServiceMockLegacy();
          }
 
-        $convertLogLevelServiceMock = $this->createMock(ConvertLogLevelServiceInterface::class);
+        $convertLogLevelServiceMock = $this->createStub(ConvertLogLevelServiceInterface::class);
 
-        $convertLogLevelServiceMock->method('toNumeric')->will($this->returnValueMap([
+        $convertLogLevelServiceMock->method('toNumeric')->willReturnMap([
             [\Psr\Log\LogLevel::EMERGENCY, \Klevu\Logger\Constants::ZEND_LOG_EMERG],
             [\Psr\Log\LogLevel::ALERT, \Klevu\Logger\Constants::ZEND_LOG_ALERT],
             [\Psr\Log\LogLevel::CRITICAL, \Klevu\Logger\Constants::ZEND_LOG_CRIT],
@@ -304,8 +307,8 @@ class LoggingEnabledServiceTest extends TestCase
             [\Psr\Log\LogLevel::NOTICE, \Klevu\Logger\Constants::ZEND_LOG_NOTICE],
             [\Psr\Log\LogLevel::INFO, \Klevu\Logger\Constants::ZEND_LOG_INFO],
             [\Psr\Log\LogLevel::DEBUG, \Klevu\Logger\Constants::ZEND_LOG_DEBUG],
-        ]));
-        $convertLogLevelServiceMock->method('fromNumeric')->will($this->returnValueMap([
+        ]);
+        $convertLogLevelServiceMock->method('fromNumeric')->willReturnMap([
             [\Klevu\Logger\Constants::ZEND_LOG_EMERG, \Psr\Log\LogLevel::EMERGENCY],
             [\Klevu\Logger\Constants::ZEND_LOG_ALERT, \Psr\Log\LogLevel::ALERT],
             [\Klevu\Logger\Constants::ZEND_LOG_CRIT, \Psr\Log\LogLevel::CRITICAL],
@@ -314,7 +317,7 @@ class LoggingEnabledServiceTest extends TestCase
             [\Klevu\Logger\Constants::ZEND_LOG_NOTICE, \Psr\Log\LogLevel::NOTICE],
             [\Klevu\Logger\Constants::ZEND_LOG_INFO, \Psr\Log\LogLevel::INFO],
             [\Klevu\Logger\Constants::ZEND_LOG_DEBUG, \Psr\Log\LogLevel::DEBUG],
-        ]));
+        ]);
 
         return $convertLogLevelServiceMock;
     }
@@ -328,8 +331,7 @@ class LoggingEnabledServiceTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $convertLogLevelServiceMock->expects($this->any())
-            ->method('toNumeric')
+        $convertLogLevelServiceMock->method('toNumeric')
             ->willReturnMap([
                 [\Psr\Log\LogLevel::EMERGENCY, \Klevu\Logger\Constants::ZEND_LOG_EMERG],
                 [\Psr\Log\LogLevel::ALERT, \Klevu\Logger\Constants::ZEND_LOG_ALERT],
@@ -340,8 +342,7 @@ class LoggingEnabledServiceTest extends TestCase
                 [\Psr\Log\LogLevel::INFO, \Klevu\Logger\Constants::ZEND_LOG_INFO],
                 [\Psr\Log\LogLevel::DEBUG, \Klevu\Logger\Constants::ZEND_LOG_DEBUG],
             ]);
-        $convertLogLevelServiceMock->expects($this->any())
-            ->method('fromNumeric')
+        $convertLogLevelServiceMock->method('fromNumeric')
             ->willReturnMap([
                 [\Klevu\Logger\Constants::ZEND_LOG_EMERG, \Psr\Log\LogLevel::EMERGENCY],
                 [\Klevu\Logger\Constants::ZEND_LOG_ALERT, \Psr\Log\LogLevel::ALERT],
@@ -358,16 +359,16 @@ class LoggingEnabledServiceTest extends TestCase
 
     /**
      * @param array $returnValueMap
-     * @return LogLevelComparatorService|\PHPUnit\Framework\MockObject\MockObject
+     * @return LogLevelComparatorService|\PHPUnit\Framework\MockObject\Stub
      */
     private function getLogLevelComparatorServiceMock(array $returnValueMap)
     {
-         if (!method_exists($this, 'createMock')) {
+         if (!method_exists($this, 'createStub')) {
              return $this->getLogLevelComparatorServiceMockLegacy($returnValueMap);
          }
 
-        $logLevelComparatorServiceMock = $this->createMock(LogLevelComparatorService::class);
-        $logLevelComparatorServiceMock->method('compare')->will($this->returnValueMap($returnValueMap));
+        $logLevelComparatorServiceMock = $this->createStub(LogLevelComparatorService::class);
+        $logLevelComparatorServiceMock->method('compare')->willReturnMap($returnValueMap);
 
         return $logLevelComparatorServiceMock;
     }
@@ -382,8 +383,7 @@ class LoggingEnabledServiceTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $logLevelComparatorServiceMock->expects($this->any())
-            ->method('compare')
+        $logLevelComparatorServiceMock->method('compare')
             ->willReturnMap($returnValueMap);
 
         return $logLevelComparatorServiceMock;
@@ -391,15 +391,15 @@ class LoggingEnabledServiceTest extends TestCase
 
     /**
      * @param int $storeId
-     * @return Store|\PHPUnit\Framework\MockObject\MockObject
+     * @return Store|\PHPUnit\Framework\MockObject\Stub
      */
     private function getStoreMock($storeId)
     {
-        if (!method_exists($this, 'createMock')) {
+        if (!method_exists($this, 'createStub')) {
             return $this->getStoreMockLegacy($storeId);
         }
 
-        $storeMock = $this->createMock(Store::class);
+        $storeMock = $this->createStub(Store::class);
         $storeMock->method('getId')->willReturn($storeId);
 
         return $storeMock;
@@ -407,7 +407,7 @@ class LoggingEnabledServiceTest extends TestCase
 
     /**
      * @param int $storeId
-     * @return Store|\PHPUnit\Framework\MockObject\MockObject
+     * @return Store|\PHPUnit\Framework\MockObject\Stub
      */
     private function getStoreMockLegacy($storeId)
     {
@@ -415,8 +415,7 @@ class LoggingEnabledServiceTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $storeMock->expects($this->any())
-            ->method('getId')
+        $storeMock->method('getId')
             ->willReturn($storeId);
 
         return $storeMock;

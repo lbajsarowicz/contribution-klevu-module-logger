@@ -50,22 +50,11 @@ class ArchiveLogFileServiceTest extends TestCase
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $reportedDestinationFilePath = $archiveLogFileService->execute($sourceFilePath);
-        if (method_exists($this, 'assertMatchesRegularExpression')) {
-            $this->assertMatchesRegularExpression(
-                '/' . preg_quote($this->installDir . '/var/log/Klevu_Search.', '/') . '[0-9]{9,11}' . preg_quote('.log', '/') . '/',
-                $reportedDestinationFilePath
-            );
-        } else {
-            $this->assertRegExp(
-                '/' . preg_quote($this->installDir . '/var/log/Klevu_Search.', '/') . '[0-9]{9,11}' . preg_quote('.log', '/') . '/',
-                $reportedDestinationFilePath
-            );
-        }
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertFileDoesNotExist($sourceFilePath);
-        } else {
-            $this->assertFileNotExists($sourceFilePath);
-        }
+        $this->assertMatchesRegularExpression(
+            '/' . preg_quote($this->installDir . '/var/log/Klevu_Search.', '/') . '[0-9]{9,11}' . preg_quote('.log', '/') . '/',
+            $reportedDestinationFilePath
+        );
+        $this->assertFileDoesNotExist($sourceFilePath);
         $this->assertFileExists($reportedDestinationFilePath);
 
         $destinationContentHash = crc32(file_get_contents($reportedDestinationFilePath));
@@ -98,19 +87,11 @@ class ArchiveLogFileServiceTest extends TestCase
         $this->assertFileExists($sourceFilePath);
 
         $destinationFilePath = $this->installDir . '/etc/Klevu_Search.' . time() . '.log';
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(ArchiveLogFileException::class);
-        } else {
-            $this->setExpectedException(ArchiveLogFileException::class);
-        }
+        $this->expectException(ArchiveLogFileException::class);
         $reportedDestinationFilePath = $archiveLogFileService->execute($sourceFilePath);
         $this->assertEmpty($reportedDestinationFilePath, var_export($reportedDestinationFilePath, true));
         $this->assertFileExists($sourceFilePath);
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertFileDoesNotExist($destinationFilePath);
-        } else {
-            $this->assertFileNotExists($destinationFilePath);
-        }
+        $this->assertFileDoesNotExist($destinationFilePath);
     }
 
     /**
@@ -134,17 +115,9 @@ class ArchiveLogFileServiceTest extends TestCase
         ]);
         $sourceFilePath = $this->installDir . '/var/log/Klevu_Search' . crc32(time()) . '.log';
 
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertFileDoesNotExist($sourceFilePath);
-        } else {
-            $this->assertFileNotExists($sourceFilePath);
-        }
+        $this->assertFileDoesNotExist($sourceFilePath);
 
-        if (method_exists($this, 'expectException')) {
-            $this->expectException(ArchiveLogFileException::class);
-        } else {
-            $this->setExpectedException(ArchiveLogFileException::class);
-        }
+        $this->expectException(ArchiveLogFileException::class);
         $reportedDestinationFilePath = $archiveLogFileService->execute($sourceFilePath);
         $this->assertEmpty($reportedDestinationFilePath);
     }
